@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-7xl mx-auto p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">👥 Users</h1>
+    <a href="{{ url_for('users.create') }}" class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 transition">
+      ➕ Create User
+    </a>
+  </div>
+
+  <div class="overflow-x-auto bg-white shadow rounded-lg">
+    <table class="min-w-full text-sm text-left border">
+      <thead class="bg-gray-100 text-gray-700">
+        <tr>
+          <th class="p-3 border">Name</th>
+          <th class="p-3 border">Email</th>
+          <th class="p-3 border">Role</th>
+          <th class="p-3 border">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr class="border-b hover:bg-gray-50">
+          <td class="p-3">{{ user.name }}</td>
+          <td class="p-3">{{ user.email }}</td>
+          <td class="p-3">{{ 'Admin' if user.role == 1 else 'Auditor' }}</td>
+          <td class="p-3 flex space-x-2">
+            <a href="{{ url_for('users.edit', user_id=user.id) }}"
+               class="text-blue-600 hover:underline">Edit</a>
+            <form method="POST" action="{{ url_for('users.delete', user_id=user.id) }}">
+              <button type="submit" class="text-red-600 hover:underline"
+                      onclick="return confirm('Are you sure?')">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

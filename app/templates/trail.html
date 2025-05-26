@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Audit Trail{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-6">
+    <form method="get" class="mb-6">
+        <input type="text" name="search" value="{{ search_query }}" placeholder="Search audits..."
+               class="border border-gray-300 rounded px-3 py-2 w-1/3">
+        <button class="ml-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Search</button>
+    </form>
+
+    <div class="overflow-x-auto bg-white shadow rounded-lg">
+        <table class="min-w-full text-sm text-left">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="p-3">Timestamp</th>
+                    <th class="p-3">Model</th>
+                    <th class="p-3">Action</th>
+                    <th class="p-3">User ID</th>
+                    <th class="p-3">Changes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in audit_logs %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-3 text-gray-600">{{ log.timestamp }}</td>
+                    <td class="p-3">{{ log.model_name }}{% if log.model_id %} #{{ log.model_id }}{% endif %}</td>
+                    <td class="p-3 font-semibold text-blue-600 capitalize">{{ log.action.replace('_', ' ') }}</td>
+                    <td class="p-3">{{ log.user_id or "System" }}</td>
+                    <td class="p-3">
+                        {% if log.action == 'update' %}
+                            <details class="cursor-pointer">
+                                <summary class="text-blue-500 underline">View Changes</summary>
+                                <pre class="text-xs mt-2 text-gray-700">{{ log.previous_data | tojson(indent=2) }}</pre>
+                                <pre class="text-xs mt-2 text-gray-700">{{ log.new_data | tojson(indent=2) }}</pre>
+                            </details>
+
+                        {% elif log.action == 'create' %}
+                            <pre class="text-xs text-gray-700">{{ log.new_data | tojson(indent=2) }}</pre>
+
+                        {% elif log.action == 'delete' %}
+                            <pre class="text-xs text-gray-700">{{ log.previous_data | tojson(indent=2) }}</pre>
+
+                        {% elif log.action == 'audit_run' %}
+                            <details class="cursor-pointer">
+                                <summary class="text-blue-500 underline">View Audit Summary</summary>
+                                <div class="text-xs mt-2 text-gray-700 space-y-1">
+                                    {% set data = log.new_data %}
+                                    <p><strong>📄 Input File:</strong> {{ data['input_file'] }}</p>
+                                    <p><strong>📁 Output File:</strong> {{ data['output_file'] }}</p>
+                                    <p><strong>⚠️ Fraudulent Records:</strong> {{ data['counts']['fraud'] }}</p>
+                                    <p><strong>✅ Normal Records:</strong> {{ data['counts']['normal'] }}</p>
+
+                                    <a href="{{ url_for('audit.download_file', filename=data['output_file']) }}"
+                                       class="inline-block mt-2 text-emerald-600 hover:text-emerald-800 font-medium underline">
+                                        ⬇ Download Audited File
+                                    </a>
+                                </div>
+                            </details>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

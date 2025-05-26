@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | ML Auditing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/a2d9d5c6b3.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    :root {
+      --primary: #1E3A8A; /* Customize your brand colour */
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <nav class="sticky top-0 z-50 bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3">
+                <img src="{{ url_for('static', filename='images/auditlogo.png') }}" alt="Logo" class="h-9 w-auto" />
+                <span class="text-xl font-bold text-[var(--primary)]">ML Auditing</span>
+            </div>
+
+            <div class="flex items-center space-x-6 text-sm font-medium">
+                <a href="{{ url_for('auth.index') }}" class="flex items-center gap-2 hover:text-[var(--primary)] transition">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+
+                
+                {% if current_user.role == 2 %}
+
+                    <a href="{{ url_for('audit.audit') }}" class="flex items-center gap-2 hover:text-[var(--primary)] transition">
+                        <i class="fas fa-chart-line"></i> Audit Statements
+                    </a>
+
+                {% else %}
+                    <a href="{{ url_for('users.users') }}" class="flex items-center gap-2 hover:text-[var(--primary)] transition">
+                        <i class="fas fa-chart-line"></i> Users
+                    </a>
+
+                    <a href="{{ url_for('trail.trail') }}" class="flex items-center gap-2 hover:text-[var(--primary)] transition">
+                        <i class="fas fa-chart-line"></i> Audit Trail
+                    </a>
+
+                {% endif %}
+
+                <div class="relative">
+                    <button id="profile-btn" class="flex items-center focus:outline-none">
+                        <img src="{{ url_for('static', filename='images/user1.png') }}" alt="User" class="h-8 w-8 rounded-full border-2 border-[var(--primary)]" />
+                        <i class="fas fa-caret-down ml-2 text-gray-500"></i>
+                    </button>
+                    <div id="profile-menu" class="hidden absolute right-0 mt-3 w-52 bg-white shadow-xl rounded-lg py-2 border z-50">
+                        <div class="px-4 py-2">
+                            <p class="text-sm font-semibold text-gray-900">{{ current_user.name }}</p>
+                            <p class="text-xs text-gray-500">Role: {{ current_user.role }}</p>
+                        </div>
+                        <hr class="my-1">
+                        <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                            <i class="fas fa-user-circle"></i> My Profile
+                        </a>
+                        <a href="#settings" class="block px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-6 space-y-10">
+        {% block content %}
+            
+        {% endblock %}
+    </main>
+
+    <script>
+        const profileBtn = document.getElementById('profile-btn');
+        const profileMenu = document.getElementById('profile-menu');
+
+        profileBtn.addEventListener('click', () => {
+            profileMenu.classList.toggle('hidden');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+    </script>
+
+</body>
+</html>

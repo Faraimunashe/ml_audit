@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Analyse Audited{% endblock %}
+{% block content %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="max-w-7xl mx-auto bg-white p-6 rounded shadow-md">
+        <h1 class="text-2xl font-bold text-blue-800 mb-4">📊Audited Transaction Analysis</h1>
+
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-100 p-4 rounded shadow">
+                <h2 class="text-lg font-semibold">Total</h2>
+                <p class="text-xl font-bold">{{ total }}</p>
+            </div>
+            <div class="bg-green-100 p-4 rounded shadow">
+                <h2 class="text-lg font-semibold">Normal</h2>
+                <p class="text-xl font-bold">{{ normal }}</p>
+            </div>
+            <div class="bg-red-100 p-4 rounded shadow">
+                <h2 class="text-lg font-semibold">Fraudulent</h2>
+                <p class="text-xl font-bold">{{ fraud }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mb-8">
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Transaction Type Distribution</h3>
+                <canvas id="txChart"></canvas>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Fraud by Transaction Type</h3>
+                <canvas id="fraudChart"></canvas>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2">Channel Usage</h3>
+                <canvas id="channelChart"></canvas>
+            </div>
+        </div>
+
+        <h3 class="text-xl font-bold mb-2 mt-4 text-gray-700">📈 Summary Statistics</h3>
+        <div class="overflow-x-auto bg-gray-50 p-4 rounded">
+            {{ summary_table | safe }}
+        </div>
+    </div>
+
+    <script>
+        const txChart = new Chart(document.getElementById('txChart'), {
+            type: 'bar',
+            data: {
+                labels: {{ tx_labels|safe }},
+                datasets: [{
+                    label: 'Transactions',
+                    data: {{ tx_data|safe }},
+                    backgroundColor: '#3B82F6'
+                }]
+            }
+        });
+
+        const fraudChart = new Chart(document.getElementById('fraudChart'), {
+            type: 'bar',
+            data: {
+                labels: {{ fraud_labels|safe }},
+                datasets: [{
+                    label: 'Fraud Count',
+                    data: {{ fraud_data|safe }},
+                    backgroundColor: '#EF4444'
+                }]
+            }
+        });
+
+        const channelChart = new Chart(document.getElementById('channelChart'), {
+            type: 'pie',
+            data: {
+                labels: {{ channel_labels|safe }},
+                datasets: [{
+                    label: 'Channel Usage',
+                    data: {{ channel_data|safe }},
+                    backgroundColor: ['#10B981', '#F59E0B', '#6366F1', '#E11D48']
+                }]
+            }
+        });
+    </script>
+
+{% endblock %}
