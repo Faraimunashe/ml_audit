@@ -62,7 +62,9 @@ def edit(user_id):
         user.role = int(form.role.data)
 
         if form.password.data:
-            user.password = generate_password_hash(form.password.data)
+            password = form.password.data
+            passwordata = sha256_crypt.encrypt(password)
+            user.password = passwordata
 
         db.session.commit()
         log_update(user, old_data)
